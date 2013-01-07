@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+***************************************************************************************************
+	
+	tetragon - Game Engine for web- & desktop-based Flash projects.
+	  ____
+	 /   / TETRAGON
+	/___/  ENGINE
+ 	
+	Licensed under the MIT License
+	
+***************************************************************************************************
+-->
+<project default="Build" basedir=".." name="tetragon.modules.geolocationmanager">
+	
+	<!-- == PROPERTIES ======================================================================== -->
+	
+	<property name="module.name"		value="Geolocation Manager"/>
+	<property name="module.name.short"	value="geolocationmanager"/>
+	<property name="module.version"		value="0.8.0"/>
+	<property name="module.author"		value="Joe"/>
+	<property name="module.package"		value="geolocation"/>
+	<property name="module.class"		value="GeolocationManager"/>
+	
+	<property name="module.info.class"	value="${module.class}ModuleInfo"/>
+	<property name="path.src"			value="${basedir}/src/modules/${module.name.short}"/>
+	<property name="path.module"		value="${path.src}/modules/${module.package}"/>
+	<property name="swc.filename"		value="tetragon_${module.name.short}.swc"/>
+	<property name="path.libs.source"	value="${basedir}/src/libs/source"/>
+	<property name="path.libs.swc"		value="${basedir}/src/libs/swc"/>
+	<property name="swf.version"		value="11"/>
+	<property name="fpl.version"		value="10.2"/>
+	
+	<property file="${env.properties}"/>
+	
+	<taskdef resource="flexTasks.tasks" classpath="${flextasks.jar}"/>
+	
+	
+	<!-- == DEFAULT TARGETS =================================================================== -->
+	
+	<target name="Build" description="Builds the module SWC.">
+		<prepare/>
+		<compile/>
+		<refresh/>
+	</target>
+	
+	
+	<!-- == MACRODEFS ========================================================================= -->
+	
+	<macrodef name="prepare">
+		<sequential>
+			<buildnumber file="bld/${module.name.short}.number"/>
+			<tstamp>
+				<format property="build.date" pattern="dd-MMMM-yyyy HH:mm" unit="minute" locale="en"/>
+			</tstamp>
+			<echo message="*** ${module.name} version: ${module.version} build #${build.number}, ${build.date} ***" level="info"/>
+			<generateModuleInfo/>
+		</sequential>
+	</macrodef>
+	
+	
+	<macrodef name="generateModuleInfo">
+		<sequential>
+			<echo message="Generating Module Info ..." level="info"/>
+			<copy file="bld/templates/ModuleInfoClass.as" tofile="${path.module}/${module.info.class}.as" overwrite="true">
+				<filterchain>
+					<replacetokens>
+						<token key="module_package"		value="modules.${module.package}"/>
+						<token key="module_class"		value="${module.info.class}"/>
+						<token key="module_name"		value="${module.name}"/>
+						<token key="module_version"		value="${module.version}"/>
+						<token key="module_build"		value="${build.number}"/>
+						<token key="module_author"		value="${module.author}"/>
+					</replacetokens>
+				</filterchain>
+			</copy>
+		</sequential>
+	</macrodef>
+	
+	
+	<macrodef name="compile">
+		<sequential>
+			<delete file="dst/${swc.filename}"/>
+			<echo message="Compiling ${swc.filename} ..." level="info"/>
+			<compc
+				output="dst/${swc.filename}"
+				swf-version="${swf.version}"
+				target-player="${fpl.version}"
+				debug="false"
+				optimize="false"
+				strict="true">
+				
+				<load-config filename="${FLEX_HOME}/frameworks/air-config.xml"/>
+				<source-path path-element="${path.src}"/>
+				<include-sources dir="${path.src}" includes="*"/>
+				
+				<source-path path-element="${path.libs.source}"/>
+				
+				<compiler.external-library-path dir="${FLEX_HOME}/frameworks/libs/air" append="true">
+					<include name="*.swc"/>
+				</compiler.external-library-path>
+				
+				<compiler.external-library-path dir="${FLEX_HOME}/frameworks/libs" append="true">
+					<include name="framework.swc"/>
+				</compiler.external-library-path>
+				
+				<compiler.external-library-path dir="${FLEX_HOME}/frameworks/locale/en_US" append="true">
+					<include name="*.swc"/>
+				</compiler.external-library-path>
+				
+				<compiler.external-library-path dir="${path.libs.swc}" append="true">
+					<include name="*.swc"/>
+				</compiler.external-library-path>
+				
+				<!-- Adding dst folder in case the module refers another module. -->
+				<compiler.external-library-path dir="dst" append="true">
+					<include name="*.swc"/>
+				</compiler.external-library-path>
+			</compc>
+		</sequential>
+	</macrodef>
+	
+	
+	<macrodef name="refresh">
+		<sequential>
+			<eclipse.refreshLocal resource="${basedir}" depth="infinite"/>
+		</sequential>
+	</macrodef>
+	
+</project>
