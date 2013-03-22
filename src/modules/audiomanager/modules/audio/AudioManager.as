@@ -148,18 +148,18 @@ package modules.audio
 			else if (loops > MAX_LOOPS) loops = MAX_LOOPS;
 			
 			var st:SoundTransform = new SoundTransform(vol);
-			var sc:Class = getSoundClass(s);
+			//var sc:Class = getSoundClass(s);
 			
 			/* Stop the same sound if it's already playing. */
-			if (_channels[sc])
+			if (_channels[s])
 			{
-				(_channels[sc] as SoundChannel).stop();
+				(_channels[s] as SoundChannel).stop();
 			}
 			
 			/* Play the sound and get it's channel. */
 			var ch:SoundChannel = s.play(0, loops, st);
 			
-			_channels[sc] = ch;
+			_channels[s] = ch;
 			return ch;
 		}
 		
@@ -170,9 +170,9 @@ package modules.audio
 		 * @param soundClass The class of the sound.
 		 * @return true if the sound was stopped, false if the sound was not playing.
 		 */
-		public function stopSound(soundClass:Object):Boolean
+		public function stopSound(sound:Sound):Boolean
 		{
-			var channel:SoundChannel = _channels[soundClass];
+			var channel:SoundChannel = _channels[sound];
 			if (!channel) return false;
 			channel.stop();
 			delete _channels[channel];
@@ -415,10 +415,10 @@ package modules.audio
 		/**
 		 * @private
 		 */
-		private function getSoundClass(sound:Sound):Class
-		{
-			if (!sound) return null;
-			return sound['constructor'] as Class;
-		}
+//		private function getSoundClass(sound:Sound):Class
+//		{
+//			if (!sound) return null;
+//			return sound['constructor'] as Class;
+//		}
 	}
 }
