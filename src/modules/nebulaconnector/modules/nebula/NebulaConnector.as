@@ -355,7 +355,7 @@ package modules.nebula
 			_secretKey = initParams['secretKey'];
 			_dataFormat = initParams['dataFormat'];
 			
-			if (initParams['debug'] != null) _debug = initParams['debug'];
+			if (initParams['debug'] != null) _debug = initParams['debug'] as Boolean;
 			
 			/* Fallback params. */
 			if (!_apiURL) _apiURL = NebulaDefaults.API_URL_DEV;
