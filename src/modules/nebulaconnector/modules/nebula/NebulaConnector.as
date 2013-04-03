@@ -431,11 +431,11 @@ package modules.nebula
 				callbackFail("Failed to create a checkpoint.", METHOD_CREATE_CHECKPOINT, r);
 			};
 			var sendData:Object =
-			{
-				name: name ? name : "",
-				identifier: identifier ? identifier : "",
-				score: score
-			};
+				{
+					name: name ? name : "",
+						identifier: identifier ? identifier : "",
+						score: score
+				};
 			var url:String = StringUtils.format(API_LEVELS_ID_CHECKPOINTS, _levelID);
 			
 			/* Queue a signed request. */
@@ -463,10 +463,10 @@ package modules.nebula
 			{
 				callbackFail("Failed to end Nebula game", METHOD_END_GAME, r);
 			};
-
+			
 			var sendData:Object = {status:completed ? NebulaGameStatus.COMPLETED : NebulaGameStatus.FAILED};
 			var url:String = StringUtils.format(API_GAMES_ID, _gameID);
-
+			
 			// queues a signed request.
 			queueSignedRequest(new NebulaRequest(NebulaRequestMethod.PUT, url, sendData, onSuccess, onError));
 		}
@@ -561,7 +561,7 @@ package modules.nebula
 		 * @param filters
 		 */
 		public function getGameScores(leaderboardID:String, gameID:String = null, limit:uint = 100,
-			offset:uint = 0, ... filters):void
+									  offset:uint = 0, ... filters):void
 		{
 			getScores.apply(this, [leaderboardID, gameID, null, limit, offset].concat(filters));
 		}
@@ -576,7 +576,7 @@ package modules.nebula
 		 * @param filters
 		 */
 		public function getLevelScores(leaderboardID:String, gameID:String = null,
-			levelID:String = null, limit:uint = 100, offset:uint = 0, ... filters):void
+									   levelID:String = null, limit:uint = 100, offset:uint = 0, ... filters):void
 		{
 			getScores.apply(this, [leaderboardID, gameID, levelID, limit, offset].concat(filters));
 		}
@@ -743,9 +743,10 @@ package modules.nebula
 			var onSuccess:Function = function(r:NebulaRequest):void
 			{
 				if (_debug) log("Nebula player set.");
-
-				var tmpPlayer:NebulaPlayer = NebulaPlayer.createFromResponse(r.responseData['session']['player']);
-				if (_playerSetSignal) _playerSetSignal.dispatch(tmpPlayer);
+				
+				var tmpPlayer:NebulaPlayer = NebulaPlayer.createFromResponse( r.responseData['session']['player'] );
+				if (_playerSetSignal) _playerSetSignal.dispatch( tmpPlayer );
+				
 			};
 			
 			/* Error callback handler. */
@@ -876,7 +877,7 @@ package modules.nebula
 					parseInt(r.responseData['startNonce']), parseInt(r.responseData['lifetime']));
 				
 				/* if there is a valid lifetime, a timer is started that is triggered
-				 * after LIFETIME_WAIT_PERCENTAGE of the lifetime. */
+				* after LIFETIME_WAIT_PERCENTAGE of the lifetime. */
 				if (_session.lifetime != 0)
 				{
 					_sessionLifetimeTimer = new Timer(_session.lifetime * 1000 * LIFETIME_WAIT_PERCENTAGE);
@@ -1302,7 +1303,7 @@ package modules.nebula
 		 * @param warn
 		 */
 		private function callbackFail(message:String, method:String, r:NebulaRequest,
-			warn:Boolean = false):void
+									  warn:Boolean = false):void
 		{
 			/* Not using the urlPath since it includes identifiers, format and other stuff. */
 			if (r.responseData != null)
@@ -1326,7 +1327,7 @@ package modules.nebula
 		 * @param warn
 		 */
 		private function fail(message:String, method:String = null, error:Object = null,
-			warn:Boolean = false):void
+							  warn:Boolean = false):void
 		{
 			if (warn) Log.warn(message, this);
 			else Log.error(message, this);
@@ -1355,7 +1356,7 @@ package modules.nebula
 		 * @param filters filters that will be used to get the scores.
 		 */
 		private function getScores(leaderboardID:String, gameID:String = null,
-			levelID:String = null, limit:uint = 100, offset:uint = 0, ... filters):void
+								   levelID:String = null, limit:uint = 100, offset:uint = 0, ... filters):void
 		{
 			/* Success callback handler. */
 			var onSuccess:Function = function(r:NebulaRequest):void
@@ -1418,12 +1419,12 @@ package modules.nebula
 			};
 			
 			var sendData:Object =
-			{
-				offset:	offset,
-				limit:	limit,
-				level:	levelID ? levelID : "",
-				game:	gameID ? gameID : ""
-			};
+				{
+					offset:	offset,
+					limit:	limit,
+					level:	levelID ? levelID : "",
+						game:	gameID ? gameID : ""
+				};
 			var url:String = StringUtils.format(API_SCORES, leaderboardID);
 			
 			/* Iterates the filters, applying them to the sendData. */
