@@ -1,31 +1,31 @@
 /*
- *      _________  __      __
- *    _/        / / /____ / /________ ____ ____  ___
- *   _/        / / __/ -_) __/ __/ _ `/ _ `/ _ \/ _ \
- *  _/________/  \__/\__/\__/_/  \_,_/\_, /\___/_//_/
- *                                   /___/
- * 
- * Tetragon : Game Engine for multi-platform ActionScript projects.
- * http://www.tetragonengine.com/
- * Copyright (c) The respective Copyright Holder (see LICENSE).
- * 
- * Permission is hereby granted, to any person obtaining a copy of this software
- * and associated documentation files (the "Software") under the rules defined in
- * the license found at http://www.tetragonengine.com/license/ or the LICENSE
- * file included within this distribution.
- * 
- * The above copyright notice and this permission notice must be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND. THE COPYRIGHT
- * HOLDER AND ITS LICENSORS DISCLAIM ALL WARRANTIES AND CONDITIONS, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO ANY IMPLIED WARRANTIES AND CONDITIONS OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT, AND ANY
- * WARRANTIES AND CONDITIONS ARISING OUT OF COURSE OF DEALING OR USAGE OF TRADE.
- * NO ADVICE OR INFORMATION, WHETHER ORAL OR WRITTEN, OBTAINED FROM THE COPYRIGHT
- * HOLDER OR ELSEWHERE WILL CREATE ANY WARRANTY OR CONDITION NOT EXPRESSLY STATED
- * IN THIS AGREEMENT.
- */
+*      _________  __      __
+*    _/        / / /____ / /________ ____ ____  ___
+*   _/        / / __/ -_) __/ __/ _ `/ _ `/ _ \/ _ \
+*  _/________/  \__/\__/\__/_/  \_,_/\_, /\___/_//_/
+*                                   /___/
+* 
+* Tetragon : Game Engine for multi-platform ActionScript projects.
+* http://www.tetragonengine.com/
+* Copyright (c) The respective Copyright Holder (see LICENSE).
+* 
+* Permission is hereby granted, to any person obtaining a copy of this software
+* and associated documentation files (the "Software") under the rules defined in
+* the license found at http://www.tetragonengine.com/license/ or the LICENSE
+* file included within this distribution.
+* 
+* The above copyright notice and this permission notice must be included in all
+* copies or substantial portions of the Software.
+* 
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND. THE COPYRIGHT
+* HOLDER AND ITS LICENSORS DISCLAIM ALL WARRANTIES AND CONDITIONS, EXPRESS OR
+* IMPLIED, INCLUDING BUT NOT LIMITED TO ANY IMPLIED WARRANTIES AND CONDITIONS OF
+* MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT, AND ANY
+* WARRANTIES AND CONDITIONS ARISING OUT OF COURSE OF DEALING OR USAGE OF TRADE.
+* NO ADVICE OR INFORMATION, WHETHER ORAL OR WRITTEN, OBTAINED FROM THE COPYRIGHT
+* HOLDER OR ELSEWHERE WILL CREATE ANY WARRANTY OR CONDITION NOT EXPRESSLY STATED
+* IN THIS AGREEMENT.
+*/
 package modules.nebula
 {
 	import modules.nebula.data.*;
@@ -95,6 +95,9 @@ package modules.nebula
 		public static const METHOD_SET_LOCATION:String = "SET_LOCATION";
 		/** Identifier of the setPlayer method. */
 		public static const METHOD_SET_PLAYER:String = "SET_PLAYER";
+		/** Identifier of the setRecommendation method. */
+		public static const METHOD_SEND_EMAIL_RECOMMENDATION:String = "SEND_EMAIL_RECOMMENDATION";
+		
 		/** Identifier of the startGame method. */
 		public static const METHOD_START_GAME:String = "START_GAME";
 		/** Identifier of the startLevel method. */
@@ -118,6 +121,7 @@ package modules.nebula
 		private static const API_LOGS:String = "/logs"; // POST
 		/** @private */
 		private static const API_PLAYERS:String = "/players"; // GET
+		
 		/** @private */
 		private static const API_PLAYERS_ID:String = "/players/{0}"; // GET
 		/** @private */
@@ -133,6 +137,8 @@ package modules.nebula
 		/** @private */
 		private static const API_SESSIONS_ME_PLAYER:String = "/sessions/me/player"; // PUT
 		// private static const API_STATUS:String = "/status"; // GET
+		/** @private */
+		private static const API_URL_RECOMMEND:String = "/recommend/email"; // POST
 		
 		
 		//-----------------------------------------------------------------------------------------
@@ -310,6 +316,12 @@ package modules.nebula
 		private var _playerSetSignal:Signal;
 		
 		/**
+		 * Signal called when sendRecommendations returns successfully.
+		 * @private
+		 */
+		private var _emailRecommendationSetSignal:Signal;
+		
+		/**
 		 * Signal called when getPlayer or getPlayers return successfully.
 		 * @private
 		 */
@@ -338,6 +350,8 @@ package modules.nebula
 		 * @private
 		 */
 		private var _sessionStartedSignal:Signal;
+		
+
 		
 		
 		//-----------------------------------------------------------------------------------------
@@ -369,8 +383,8 @@ package modules.nebula
 				_responseParser = new XMLResponseParser();
 			
 			/* indicates flash where the application specific cross domain file will be found.
-			 * This command does not load the file itself, it just tells flash where it could
-			 * be found when a request needs to be done. */
+			* This command does not load the file itself, it just tells flash where it could
+			* be found when a request needs to be done. */
 			Security.loadPolicyFile(_apiURL + _appID + "/crossdomain.xml");
 			
 			/* Initializes the internal variables of the connector. */
@@ -485,7 +499,7 @@ package modules.nebula
 			
 			var sendData:Object = {score:score, status:completed ? NebulaLevelStatus.COMPLETED : NebulaLevelStatus.FAILED};
 			var url:String = StringUtils.format(API_LEVELS_ID, _levelID);
-
+			
 			// queues a signed request.
 			queueSignedRequest(new NebulaRequest(NebulaRequestMethod.PUT, url, sendData, onSuccess, onError));
 		}
@@ -514,16 +528,16 @@ package modules.nebula
 				_session = null;
 				_gameID = -1;
 				_levelID = -1;
-
+				
 				// cleans the lifetime timer.
 				if (_sessionLifetimeTimer != null)
 				{
 					_sessionLifetimeTimer.stop();
 					_sessionLifetimeTimer.removeEventListener(TimerEvent.TIMER, onSessionLifetimeTimer);
 				}
-
+				
 				_sessionLifetimeTimer = null;
-
+				
 				if (_sessionEndedSignal)
 					_sessionEndedSignal.dispatch();
 			};
@@ -531,9 +545,9 @@ package modules.nebula
 			{
 				callbackFail("Failed to end Nebula session", METHOD_END_SESSION, r);
 			};
-
+			
 			var sendData:Object = {status:NebulaSessionStatus.ENDED};
-
+			
 			// queues a signed request
 			queueSignedRequest(new NebulaRequest(NebulaRequestMethod.PUT, API_SESSIONS_ME, sendData, onSuccess, onError));
 		}
@@ -580,12 +594,12 @@ package modules.nebula
 			var onSuccess:Function = function(r:NebulaRequest):void
 			{
 				if (_debug) log("Loaded player from Nebula");
-
+				
 				if (_playersSignal)
 				{
 					// extracts the single player from the response.
 					var playerObject:NebulaPlayer = NebulaPlayer.createFromResponse(r.responseData['player']);
-
+					
 					_playersSignal.dispatch(Vector.<NebulaPlayer>([playerObject]));
 				}
 			};
@@ -593,10 +607,10 @@ package modules.nebula
 			{
 				callbackFail("Failed to load the Player .", METHOD_GET_PLAYER, r);
 			};
-
+			
 			var sendData:Object = {};
 			var url:String = StringUtils.format(API_PLAYERS_ID, id);
-
+			
 			// queues the request
 			queueRequest(new NebulaRequest(NebulaRequestMethod.GET, url, sendData, onSuccess, onError));
 		}
@@ -623,15 +637,15 @@ package modules.nebula
 				{
 					var responseArray:Array = r.responseData['players'];
 					var responseArrayCount:uint = responseArray.length;
-
+					
 					var players:Vector.<NebulaPlayer> = new Vector.<NebulaPlayer>(responseArray.length, true);
-
+					
 					// creates a NebulaPlayer from each object in the response
 					for (var x:uint = 0; x < responseArrayCount; x++)
 					{
 						players[x] = NebulaPlayer.createFromResponse(responseArray[x]);
 					}
-
+					
 					_playersSignal.dispatch(players);
 				}
 			};
@@ -639,11 +653,11 @@ package modules.nebula
 			{
 				callbackFail("Failed to load the Player .", METHOD_GET_PLAYER, r);
 			};
-
+			
 			// identifierType is taken as the parameter name.
 			var sendData:Object = {};
 			sendData[identifierType] = value;
-
+			
 			// queues the request
 			queueRequest(new NebulaRequest(NebulaRequestMethod.GET, API_PLAYERS, sendData, onSuccess, onError));
 		}
@@ -666,14 +680,14 @@ package modules.nebula
 			{
 				callbackFail("Failed to log message", METHOD_LOG, r);
 			};
-
+			
 			// random data is send since something needs to be signed.
 			var sendData:Object = {id:id};
-
+			
 			// data is not included if invalid.
 			if (message != null)
 				sendData['message'] = message;
-
+			
 			// value is added differently if it's a real object than if it is a String, Boolean or Number.
 			if (details != null)
 			{
@@ -702,14 +716,14 @@ package modules.nebula
 				if (_debug) log("Nebula location set.");
 				if (_locationSetSignal) _locationSetSignal.dispatch();
 			};
-
+			
 			var onError:Function = function(r:NebulaRequest):void
 			{
 				callbackFail("Failed to set Nebula location", METHOD_SET_LOCATION, r, true);
 			};
-
+			
 			var sendData:Object = {latitude:latitude, longitude:longitude, altitude:altitude};
-
+			
 			// queues the request.
 			queueSignedRequest(new NebulaRequest(NebulaRequestMethod.PUT, API_SESSIONS_ME_LOCATION, sendData, onSuccess, onError));
 		}
@@ -748,6 +762,36 @@ package modules.nebula
 				sendData, onSuccess, onError));
 		}
 		
+		/**
+		 * Sets the current recommend information. The details object can only contain native object
+		 * types, meaning Number, Boolean, String, Object and Array. Custom classes will be ignored.
+		 *
+		 * @param name and eMail information to send to the server.
+		 */
+		public function sendEmailRecommendation( emailrecommendation:NebulaEmailRecommendation ):void
+		{			
+			/* Success callback handler. */
+			var onSuccess:Function = function(r:NebulaRequest):void
+			{
+				if (_debug) log("Nebula e-mail recommendation sent.");				
+
+				if (_emailRecommendationSetSignal) _emailRecommendationSetSignal.dispatch();
+			};
+			
+			/* Error callback handler. */
+			var onError:Function = function(r:NebulaRequest):void
+			{
+				callbackFail("Failed to send e-mail recommendation.", METHOD_SEND_EMAIL_RECOMMENDATION, r);
+			};
+			
+			/*The data that will be sent. */
+			var sendData:Object = emailrecommendation.prepareData();
+			
+			/* Queues a signed request. */
+			queueSignedRequest(new NebulaRequest(NebulaRequestMethod.POST, API_URL_RECOMMEND,
+				sendData, onSuccess, onError));
+		}		
+		
 		
 		/**
 		 * Signals Nebula that a game has started.
@@ -761,14 +805,14 @@ package modules.nebula
 			{
 				_gameID = parseInt(r.responseData['game']['id']);
 				_lastGameID = _gameID;
-
+				
 				// since a new game is created all the stored level information should be destroyed.
 				_levelID = -1;
 				// TODO: should this id be reset?
 				_lastLevelID = -1;
-
+				
 				log("Started Nebula game with id \"" + _gameID.toString() + "\".");
-
+				
 				if (_gameStartedSignal)
 					_gameStartedSignal.dispatch(_gameID);
 			};
@@ -776,9 +820,9 @@ package modules.nebula
 			{
 				callbackFail("Failed to start Nebula game", METHOD_START_GAME, r);
 			};
-
+			
 			var sendData:Object = {name:name ? name : "", identifier:identifier ? identifier : ""};
-
+			
 			// queues a signed request.
 			queueSignedRequest(new NebulaRequest(NebulaRequestMethod.POST, API_SESSIONS_ME_GAMES, sendData, onSuccess, onError));
 		}
@@ -795,7 +839,7 @@ package modules.nebula
 			{
 				_levelID = parseInt(r.responseData['level']['id']);
 				_lastLevelID = _levelID;
-
+				
 				if (_debug) log("Started Nebula level with ID \"" + _levelID + "\".");
 				if (_levelStartedSignal) _levelStartedSignal.dispatch(_levelID);
 			};
@@ -803,10 +847,10 @@ package modules.nebula
 			{
 				callbackFail("Failed to start Nebula level", METHOD_START_LEVEL, r);
 			};
-
+			
 			var sendData:Object = {name:name ? name : "", identifier:identifier ? identifier : ""};
 			var url:String = StringUtils.format(API_GAMES_ID_LEVELS, _gameID);
-
+			
 			// queues a signed request.
 			queueSignedRequest(new NebulaRequest(NebulaRequestMethod.POST, url, sendData, onSuccess, onError));
 		}
@@ -895,10 +939,10 @@ package modules.nebula
 			{
 				callbackFail("Failed to update Nebula level", METHOD_UPDATE_LEVEL, r);
 			};
-
+			
 			var sendData:Object = {score:score, status:NebulaLevelStatus.RUNNING};
 			var url:String = StringUtils.format(API_LEVELS_ID, _levelID);
-
+			
 			// queues the request.
 			queueSignedRequest(new NebulaRequest(NebulaRequestMethod.PUT, url, sendData, onSuccess, onError));
 		}
@@ -920,8 +964,8 @@ package modules.nebula
 			if (!_errorSignal) _errorSignal = new Signal();
 			return _errorSignal;
 		}
-
-
+		
+		
 		public function get gameEndedSignal():Signal
 		{
 			if (!_gameEndedSignal) _gameEndedSignal = new Signal();
@@ -941,8 +985,8 @@ package modules.nebula
 			if (!_levelEndedSignal) _levelEndedSignal = new Signal();
 			return _levelEndedSignal;
 		}
-
-
+		
+		
 		public function get levelStartedSignal():Signal
 		{
 			if (!_levelStartedSignal) _levelStartedSignal = new Signal();
@@ -955,8 +999,8 @@ package modules.nebula
 			if (!_levelUpdatedSignal) _levelUpdatedSignal = new Signal();
 			return _levelUpdatedSignal;
 		}
-
-
+		
+		
 		public function get locationSetSignal():Signal
 		{
 			if (!_locationSetSignal) _locationSetSignal = new Signal();
@@ -975,6 +1019,12 @@ package modules.nebula
 		{
 			if (!_playerSetSignal) _playerSetSignal = new Signal();
 			return _playerSetSignal;
+		}
+		
+		public function get recommendationSetSignal():Signal
+		{
+			if(!_emailRecommendationSetSignal) _emailRecommendationSetSignal = new Signal();
+			return _emailRecommendationSetSignal;
 		}
 		
 		
@@ -1154,7 +1204,7 @@ package modules.nebula
 			// valid session needs to exist.
 			if (!_session)
 				return;
-
+			
 			var onSuccess:Function = function(r:NebulaRequest):void
 			{
 				_sessionLifetimeTimer.start();
@@ -1164,9 +1214,9 @@ package modules.nebula
 			{
 				callbackFail("Failed to extend the lifetime of the session", METHOD_KEEPALIVE_SESSION, r);
 			};
-
+			
 			var sendData:Object = {status:NebulaSessionStatus.RUNNING};
-
+			
 			// queues a signed request
 			queueSignedRequest(new NebulaRequest(NebulaRequestMethod.PUT, API_SESSIONS_ME, sendData, onSuccess, onError));
 		}
@@ -1185,14 +1235,14 @@ package modules.nebula
 				// sets the active request.
 				_currentRequest = _pendingRequests.shift();
 				_httpStatus = null;
-
+				
 				// adds the variables to send to the request.
 				var requestVariables:URLVariables = new URLVariables();
 				for (var k:String in _currentRequest.sendData)
 				{
 					requestVariables[k] = _currentRequest.sendData[k];
 				}
-
+				
 				// prepares the url request. // {_apiURL}/{_appId}{/urlPath}.{format}
 				var urlRequest:URLRequest = new URLRequest(_apiURL + _appID + _currentRequest.urlPath + "." + _dataFormat);
 				
@@ -1200,7 +1250,7 @@ package modules.nebula
 				{
 					Log.debug("dequeuePendingRequest: " + _currentRequest.requestMethod + " " + urlRequest.url, this);
 				}
-
+				
 				// depending on the request method, different options are set.
 				switch (_currentRequest.requestMethod)
 				{
@@ -1223,16 +1273,16 @@ package modules.nebula
 						urlRequest.requestHeaders.push(new URLRequestHeader("X-HTTP-Method-Override", "GET"));
 						break;
 				}
-
+				
 				// sets the variables.
 				urlRequest.data = requestVariables;
 				// sets the content type.
 				urlRequest.contentType = "application/x-www-form-urlencoded";
 				urlRequest.requestHeaders.push(new URLRequestHeader("Accept", "application/" + _dataFormat));
-
+				
 				// stores the object to be requested.
 				_currentRequest.urlRequest = urlRequest;
-
+				
 				// checks if something should be done before sending the request.
 				if (_currentRequest.beforeSendHandler != null)
 					_currentRequest.beforeSendHandler(_currentRequest);
@@ -1280,7 +1330,7 @@ package modules.nebula
 		{
 			if (warn) Log.warn(message, this);
 			else Log.error(message, this);
-
+			
 			// TODO use the id field of the NebulaError to identify each possible error.
 			if (_errorSignal && method && error)
 			{
@@ -1525,11 +1575,11 @@ package modules.nebula
 				// includes the access token
 				request.sendData['authToken'] = _session.authToken;
 			}
-
+			
 			// if no function was provided, the request will be signed.
 			if (request.beforeSendHandler == null)
 				request.beforeSendHandler = signRequest;
-
+			
 			queueRequest(request);
 		}
 		
@@ -1546,12 +1596,12 @@ package modules.nebula
 			_currentRequest = null;
 			_pendingRequests = new Vector.<NebulaRequest>();
 			_httpStatus = null;
-
+			
 			_gameID = -1;
 			_lastGameID = -1;
 			_levelID = -1;
 			_lastLevelID = -1;
-
+			
 			// creates the loader used to make the requests.
 			_urlLoader = new URLLoader();
 			_urlLoader.dataFormat = URLLoaderDataFormat.TEXT;
@@ -1576,13 +1626,13 @@ package modules.nebula
 			var key:String;
 			var sortedKeys:Array = [];
 			var message:String = "";
-
+			
 			for (key in request.sendData)
 			{
 				sortedKeys.push(key);
 			}
 			sortedKeys.sort();
-
+			
 			// creates a message with the sorted keys. This will be used to calculate
 			// the signature of the request.
 			for (key in sortedKeys)
@@ -1591,31 +1641,31 @@ package modules.nebula
 					message += "&";
 				message += sortedKeys[key] + "=" + request.sendData[sortedKeys[key]];
 			}
-
+			
 			// if a session is available the session key is appended to the
 			// secretKey
 			if (_session)
 				secretKey += _session.sessionKey;
-
+			
 			// calculates the signature of the request based on the message
 			// and the secretKey.
 			var keyBytes:ByteArray;
 			var messageBytes:ByteArray;
 			var shaBytes:ByteArray;
 			var sha:String;
-
+			
 			keyBytes = new ByteArray();
 			keyBytes.writeUTFBytes(secretKey);
 			messageBytes = new ByteArray();
 			messageBytes.writeUTFBytes(message);
 			shaBytes = _hmacHash.compute(keyBytes, messageBytes);
 			sha = Hex.fromArray(shaBytes);
-
+			
 			// adds the X-Nebula-Sign header with the signature.
 			request.urlRequest.requestHeaders.push(new URLRequestHeader("X-Nebula-Sign", sha));
 		}
-
-
+		
+		
 		/**
 		 * @private
 		 */
@@ -1631,13 +1681,13 @@ package modules.nebula
 			{
 				callbackFail("Failed to publish Nebula game", METHOD_SUBMIT_SCORE, r);
 			};
-
+			
 			// adds the identifier and the id to the data to send.
 			var sendData:Object = {};
 			sendData[identifier] = id;
-
+			
 			var url:String = StringUtils.format(API_SCORES, leaderboard);
-
+			
 			// queues the request.
 			queueSignedRequest(new NebulaRequest(NebulaRequestMethod.POST, url, sendData, onSuccess, onError));
 		}
