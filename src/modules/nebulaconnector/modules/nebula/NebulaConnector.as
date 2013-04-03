@@ -32,19 +32,19 @@ package modules.nebula
 	import modules.nebula.data.filters.*;
 	import modules.nebula.net.*;
 	import modules.nebula.utils.*;
-
+	
 	import tetragon.debug.Log;
 	import tetragon.modules.IModule;
 	import tetragon.modules.IModuleInfo;
 	import tetragon.modules.Module;
-
+	
 	import com.hexagonstar.net.HTTPStatusCodes;
 	import com.hexagonstar.signals.Signal;
 	import com.hexagonstar.util.reflection.dumpObj;
 	import com.hurlant.crypto.hash.HMAC;
 	import com.hurlant.crypto.hash.SHA1;
 	import com.hurlant.util.Hex;
-
+	
 	import flash.events.Event;
 	import flash.events.HTTPStatusEvent;
 	import flash.events.IOErrorEvent;
@@ -59,8 +59,8 @@ package modules.nebula
 	import flash.system.Security;
 	import flash.utils.ByteArray;
 	import flash.utils.Timer;
-
-
+	
+	
 	/**
 	 * A connector module used for communication between Tetragon and Nebula.
 	 *
@@ -121,7 +121,6 @@ package modules.nebula
 		private static const API_LOGS:String = "/logs"; // POST
 		/** @private */
 		private static const API_PLAYERS:String = "/players"; // GET
-		
 		/** @private */
 		private static const API_PLAYERS_ID:String = "/players/{0}"; // GET
 		/** @private */
@@ -350,8 +349,6 @@ package modules.nebula
 		 * @private
 		 */
 		private var _sessionStartedSignal:Signal;
-		
-
 		
 		
 		//-----------------------------------------------------------------------------------------
@@ -744,9 +741,8 @@ package modules.nebula
 			{
 				if (_debug) log("Nebula player set.");
 				
-				var tmpPlayer:NebulaPlayer = NebulaPlayer.createFromResponse( r.responseData['session']['player'] );
-				if (_playerSetSignal) _playerSetSignal.dispatch( tmpPlayer );
-				
+				var tmpPlayer:NebulaPlayer = NebulaPlayer.createFromResponse(r.responseData['session']['player']);
+				if (_playerSetSignal) _playerSetSignal.dispatch(tmpPlayer);
 			};
 			
 			/* Error callback handler. */
