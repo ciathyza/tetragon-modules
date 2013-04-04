@@ -47,7 +47,7 @@ package modules.nebula
 		}
 		public function get build():String
 		{
-			return "394";
+			return "395";
 		}
 		public function get author():String
 		{
