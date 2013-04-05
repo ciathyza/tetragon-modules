@@ -256,6 +256,12 @@ package modules.audio
 		{
 			if (_musicVolume > 0) _musicVolume = 0;
 			else _musicVolume = _musicVolumeDefault;
+			
+			var currentMusic:Music = _musics[_currentMusicID];
+			if (currentMusic)
+			{
+				currentMusic.volume = _musicVolume;
+			}
 		}
 		
 		
