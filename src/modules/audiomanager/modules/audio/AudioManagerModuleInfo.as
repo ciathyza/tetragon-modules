@@ -47,7 +47,7 @@ package modules.audio
 		}
 		public function get build():String
 		{
-			return "10";
+			return "11";
 		}
 		public function get author():String
 		{

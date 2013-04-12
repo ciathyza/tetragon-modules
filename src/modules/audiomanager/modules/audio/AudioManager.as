@@ -203,6 +203,7 @@ package modules.audio
 		 */
 		public function createMusic(id:String, loops:Array, sequence:Array):Music
 		{
+			if (_musics[id]) return _musics[id];
 			var music:Music = new Music();
 			for (var i:uint = 0; i < loops.length; i++)
 			{
