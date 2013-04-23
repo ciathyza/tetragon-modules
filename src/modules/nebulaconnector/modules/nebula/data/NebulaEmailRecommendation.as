@@ -36,45 +36,60 @@ package modules.nebula.data
 	 */
 	public final class NebulaEmailRecommendation
 	{
+		//-----------------------------------------------------------------------------------------
+		// Constants
+		//-----------------------------------------------------------------------------------------
+		
 		/** Defines the email property name. */
 		private static const EMAIL_PROPERTY_NAME:String = "email";
 		/** Defines the firstname property name. */
 		private static const NAME_PROPERTY_NAME:String = "name";
-
-
-		/**
-		 * Creates a new NebulaRecommendation using the information obtained
-		 * from the server response.
-		 *
-		 * @param response object that contains the properties of the email recommendation.
-		 *
-		 * @return a new NebulaRecommendation with the information obtained from the server.
-		 */
-		public static function createFromResponse(response:Object):NebulaEmailRecommendation
-		{
-			var tmp:NebulaEmailRecommendation = new NebulaEmailRecommendation();
-
-			for (var key:String in response)
-			{
-				// sets the obtained value from the server.
-				tmp.setValue(key, response[key]);
-			}
-
-			return tmp;
-		}
-
-
+		/** Defines the firstname property name. */
+		private static const LANGUAGE_PROPERTY_NAME:String = "language";
+		
+		
+		//-----------------------------------------------------------------------------------------
+		// Properties
+		//-----------------------------------------------------------------------------------------
+		
 		/** Object used to store the values of the recommendation. All the values of the user are optional/*/
 		private var _dataStorage:Object;
-
-
+		
+		
+		//-----------------------------------------------------------------------------------------
+		// Constructor
+		//-----------------------------------------------------------------------------------------
+		
 		/**
 		 * Creates a new NebulaRecommendation instance.
 		 */
 		public function NebulaEmailRecommendation():void
 		{
 			// initializes the data storage for the recommendation info.
-			_dataStorage = new Object;
+			_dataStorage = {};
+		}
+		
+		
+		//-----------------------------------------------------------------------------------------
+		// Public Methods
+		//-----------------------------------------------------------------------------------------
+		
+		/**
+		 * Creates a new NebulaRecommendation using the information obtained
+		 * from the server response.
+		 *
+		 * @param response object that contains the properties of the email recommendation.
+		 * @return a new NebulaRecommendation with the information obtained from the server.
+		 */
+		public static function createFromResponse(response:Object):NebulaEmailRecommendation
+		{
+			var tmp:NebulaEmailRecommendation = new NebulaEmailRecommendation();
+			for (var key:String in response)
+			{
+				// sets the obtained value from the server.
+				tmp.setValue(key, response[key]);
+			}
+			return tmp;
 		}
 
 
@@ -88,8 +103,8 @@ package modules.nebula.data
 		{
 			return ObjectUtils.flatten(_dataStorage);
 		}
-
-
+		
+		
 		public function toString():String
 		{
 			var tmpString:String = "[NebulaRecommendation";
@@ -102,8 +117,46 @@ package modules.nebula.data
 			}
 			return tmpString + "]";
 		}
+		
+		
+		//-----------------------------------------------------------------------------------------
+		// Accessors
+		//-----------------------------------------------------------------------------------------
+
+		public function get email():String
+		{
+			return getValue(EMAIL_PROPERTY_NAME) as String;
+		}
+		public function set email(v:String):void
+		{
+			setValue(EMAIL_PROPERTY_NAME, v);
+		}
 
 
+		public function get name():String
+		{
+			return getValue(NAME_PROPERTY_NAME) as String;
+		}
+		public function set name(v:String):void
+		{
+			setValue(NAME_PROPERTY_NAME, v);
+		}
+		
+		
+		public function get language():String
+		{
+			return getValue(LANGUAGE_PROPERTY_NAME) as String;
+		}
+		public function set language(v:String):void
+		{
+			setValue(LANGUAGE_PROPERTY_NAME, v);
+		}
+		
+		
+		//-----------------------------------------------------------------------------------------
+		// Private Methods
+		//-----------------------------------------------------------------------------------------
+		
 		private function getValue(key:String):Object
 		{
 			return _dataStorage[key];
@@ -113,30 +166,6 @@ package modules.nebula.data
 		private function setValue(key:String, value:Object):void
 		{
 			_dataStorage[key] = value;
-		}
-
-
-		public function get email():String
-		{
-			return getValue(EMAIL_PROPERTY_NAME) as String;
-		}
-
-
-		public function set email(value:String):void
-		{
-			setValue(EMAIL_PROPERTY_NAME, value);
-		}
-
-
-		public function get name():String
-		{
-			return getValue(NAME_PROPERTY_NAME) as String;
-		}
-
-
-		public function set name(value:String):void
-		{
-			setValue(NAME_PROPERTY_NAME, value);
 		}
 	}
 }

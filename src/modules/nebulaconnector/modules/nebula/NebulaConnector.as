@@ -72,6 +72,7 @@ package modules.nebula
 		// -----------------------------------------------------------------------------------------
 		// Constants
 		// -----------------------------------------------------------------------------------------
+		
 		/** Percentage of the lifetime, that the connector will wait, to send a keep alive request. */
 		public static const LIFETIME_WAIT_PERCENTAGE:Number = 0.75;
 		/** Identifier of the createCheckpoint method. */
@@ -149,9 +150,12 @@ package modules.nebula
 		/** @private */
 		private static const API_URL_RECOMMEND:String = "/recommend/email";
 		// POST
+		
+		
 		// -----------------------------------------------------------------------------------------
 		// Properties
 		// -----------------------------------------------------------------------------------------
+		
 		/**
 		 * URL where the service is located, without the application id.
 		 * (e.g. http://nebula.nothing.ch/api/foo/ for the foo app).
@@ -238,9 +242,12 @@ package modules.nebula
 		 * @private
 		 */
 		private var _debug:Boolean = true;
+		
+		
 		// -----------------------------------------------------------------------------------------
 		// Signals
 		// -----------------------------------------------------------------------------------------
+		
 		/**
 		 * Signal called when createCheckpoint returns successfully.
 		 * @private
@@ -735,10 +742,9 @@ package modules.nebula
 			var onSuccess:Function = function(r:NebulaRequest):void
 			{
 				if (_debug) log("Nebula e-mail recommendation sent.");
-
 				if (_emailRecommendationSetSignal) _emailRecommendationSetSignal.dispatch();
 			};
-
+			
 			/* Error callback handler. */
 			var onError:Function = function(r:NebulaRequest):void
 			{
@@ -749,7 +755,8 @@ package modules.nebula
 			var sendData:Object = emailrecommendation.prepareData();
 
 			/* Queues a signed request. */
-			queueSignedRequest(new NebulaRequest(NebulaRequestMethod.POST, API_URL_RECOMMEND, sendData, onSuccess, onError));
+			queueSignedRequest(new NebulaRequest(NebulaRequestMethod.POST, API_URL_RECOMMEND,
+				sendData, onSuccess, onError));
 		}
 
 
@@ -1155,7 +1162,7 @@ package modules.nebula
 		/**
 		 * @private
 		 */
-		protected function keepAliveSession():void
+		private function keepAliveSession():void
 		{
 			// valid session needs to exist.
 			if (!_session)
