@@ -358,18 +358,26 @@ package modules.nebula
 				_responseParser = new JSONResponseParser();
 			else if (_dataFormat == NebulaResponseDataFormat.XML)
 				_responseParser = new XMLResponseParser();
-
+			
 			/* indicates flash where the application specific cross domain file will be found.
 			 * This command does not load the file itself, it just tells flash where it could
 			 * be found when a request needs to be done. */
-			Security.loadPolicyFile(_apiURL + _appID + "/crossdomain.xml");
-
+			try
+			{
+				Security.loadPolicyFile(_apiURL + _appID + "/crossdomain.xml");
+			}
+			catch (err:Error)
+			{
+				Log.warn("init:: Security.loadPolicyFile failed!", this);
+			}
+			
 			/* Initializes the internal variables of the connector. */
 			setup();
 
 			if (_debug)
 			{
-				log("Initialized with apiURL: " + _apiURL + ", appID: " + _appID + ", secretKey: " + mask(_secretKey) + ", dataFormat: " + _dataFormat);
+				log("Initialized with apiURL: " + _apiURL + ", appID: " + _appID
+					+ ", secretKey: " + mask(_secretKey) + ", dataFormat: " + _dataFormat);
 			}
 		}
 
@@ -837,36 +845,53 @@ package modules.nebula
 			/* Success handler. */
 			var onSuccess:Function = function(r:NebulaRequest):void
 			{
-				/* Creates a new session from the values returned by the server. */
-				_session = new NebulaSession(parseInt(r.responseData['id']), r.responseData['sessionKey'], r.responseData['authToken'], parseInt(r.responseData['startNonce']), parseInt(r.responseData['lifetime']));
-
-				/* if there is a valid lifetime, a timer is started that is triggered
-				 * after LIFETIME_WAIT_PERCENTAGE of the lifetime. */
-				if (_session.lifetime != 0)
+				if (r.responseData)
 				{
-					_sessionLifetimeTimer = new Timer(_session.lifetime * 1000 * LIFETIME_WAIT_PERCENTAGE);
-					_sessionLifetimeTimer.addEventListener(TimerEvent.TIMER, onSessionLifetimeTimer);
-					_sessionLifetimeTimer.start();
+					/* Creates a new session from the values returned by the server. */
+					_session = new NebulaSession();
+					_session.id = int(r.responseData['id']),
+					_session.sessionKey = r.responseData['sessionKey'],
+					_session.authToken = r.responseData['authToken'],
+					_session.nonce = int(r.responseData['startNonce']),
+					_session.lifetime = int(r.responseData['lifetime']);
+					
+					/* if there is a valid lifetime, a timer is started that is triggered
+					 * after LIFETIME_WAIT_PERCENTAGE of the lifetime. */
+					if (_session.lifetime != 0)
+					{
+						_sessionLifetimeTimer = new Timer(_session.lifetime * 1000 * LIFETIME_WAIT_PERCENTAGE);
+						_sessionLifetimeTimer.addEventListener(TimerEvent.TIMER, onSessionLifetimeTimer);
+						_sessionLifetimeTimer.start();
+					}
+					if (_debug)
+					{
+						log("Started Nebula session with ID \"" + _session.id.toString() + "\".");
+					}
+					if (_sessionStartedSignal)
+					{
+						_sessionStartedSignal.dispatch();
+					}
 				}
-
-				if (_debug) log("Started Nebula session with ID \"" + _session.id.toString() + "\".");
-				if (_sessionStartedSignal) _sessionStartedSignal.dispatch();
+				else
+				{
+					fail("responseData is null!", "startSession.onSuccess");
+				}
 			};
-
+			
 			/* Error handler. */
 			var onError:Function = function(r:NebulaRequest):void
 			{
 				callbackFail("Failed to start Nebula session.", METHOD_START_SESSION, r);
 			};
-
-			/* random data is send since something needs to be signed. */
+			
+			/* Random data is send since something needs to be signed. */
 			var sendData:Object = {init: 1};
-
 			/* queues a signed request. */
-			queueSignedRequest(new NebulaRequest(NebulaRequestMethod.POST, API_SESSIONS, sendData, onSuccess, onError));
+			queueSignedRequest(new NebulaRequest(NebulaRequestMethod.POST, API_SESSIONS, sendData,
+				onSuccess, onError));
 		}
-
-
+		
+		
 		public function submitGameScore(leaderboard:String):void
 		{
 			submitScore(leaderboard, "gameId", _lastGameID);
@@ -1097,8 +1122,6 @@ package modules.nebula
 		{
 			return _debug;
 		}
-
-
 		public function set debug(v:Boolean):void
 		{
 			_debug = v;
@@ -1165,8 +1188,7 @@ package modules.nebula
 		private function keepAliveSession():void
 		{
 			// valid session needs to exist.
-			if (!_session)
-				return;
+			if (!_session) return;
 
 			var onSuccess:Function = function(r:NebulaRequest):void
 			{
@@ -1175,13 +1197,15 @@ package modules.nebula
 			};
 			var onError:Function = function(r:NebulaRequest):void
 			{
-				callbackFail("Failed to extend the lifetime of the session", METHOD_KEEPALIVE_SESSION, r);
+				callbackFail("Failed to extend the lifetime of the session",
+					METHOD_KEEPALIVE_SESSION, r);
 			};
 
 			var sendData:Object = {status: NebulaSessionStatus.RUNNING};
 
 			// queues a signed request
-			queueSignedRequest(new NebulaRequest(NebulaRequestMethod.PUT, API_SESSIONS_ME, sendData, onSuccess, onError));
+			queueSignedRequest(new NebulaRequest(NebulaRequestMethod.PUT, API_SESSIONS_ME,
+				sendData, onSuccess, onError));
 		}
 
 

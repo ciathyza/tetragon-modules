@@ -28,58 +28,62 @@
  */
 package modules.nebula.data
 {
-    import modules.nebula.utils.StringUtils;
+	import modules.nebula.utils.StringUtils;
 
-    /**
-     * @author joe (joe@nothing.ch)
-     */
-    public class NebulaSession
-    {
-        /**
-         * Authorization token of the current session. It should be included with the request everytime that a
-         * call needs to be signed.
-         */
-        public var authToken:String;
-        /** The date in which this session will expire. Currently this property is not used.*/
-        public var expireDate:Date;
-        /** Identifier of the current session. It is returned by the server. */
-        public var id:int;
-        /** Life in seconds, of the current session. */
-        public var lifetime:int;
-        /** Current location of the player. */
-        public var location:Object;
-        /** Nonce number used to identify each message. It should be incremented after each usage. */
-        public var nonce:int;
-        /** Current player of the session. */
-        public var player:NebulaPlayer;
-        /** Key used in conjuction with the secret key to sign every request. */
-        public var sessionKey:String;
 
-        /**
-         * Creates a new NebulaSession instance.
-         *
-         * @param id
-         * @param key
-         * @param authToken
-         * @param nonce
-         *
-         */
-        public function NebulaSession(id:int, sessionKey:String, authToken:String, nonce:int, lifetime:int):void
-        {
-            // initializes the variables.
-            this.id = id;
-            this.sessionKey = sessionKey;
-            this.authToken = authToken;
-            this.nonce = nonce;
-            this.lifetime = lifetime;
+	/**
+	 * @author joe (joe@nothing.ch)
+	 */
+	public class NebulaSession
+	{
+		/**
+		 * Authorization token of the current session. It should be included with the request everytime that a
+		 * call needs to be signed.
+		 */
+		public var authToken:String;
+		/** The date in which this session will expire. Currently this property is not used.*/
+		public var expireDate:Date;
+		/** Identifier of the current session. It is returned by the server. */
+		public var id:int;
+		/** Life in seconds, of the current session. */
+		public var lifetime:int;
+		/** Current location of the player. */
+		public var location:Object;
+		/** Nonce number used to identify each message. It should be incremented after each usage. */
+		public var nonce:int;
+		/** Current player of the session. */
+		public var player:NebulaPlayer;
+		/** Key used in conjuction with the secret key to sign every request. */
+		public var sessionKey:String;
 
-            location = null;
-            player = null;
-        }
 
-        public function toString():String
-        {
-            return StringUtils.format("[NebulaSession id={0}]", id);
-        }
-    }
+		/**
+		 * Creates a new NebulaSession instance.
+		 *
+		 * @param id
+		 * @param key
+		 * @param authToken
+		 * @param nonce
+		 *
+		 */
+		public function NebulaSession(id:int = 0, sessionKey:String = null, authToken:String = null,
+			nonce:int = 0, lifetime:int = 0):void
+		{
+			// initializes the variables.
+			this.id = id;
+			this.sessionKey = sessionKey;
+			this.authToken = authToken;
+			this.nonce = nonce;
+			this.lifetime = lifetime;
+
+			location = null;
+			player = null;
+		}
+
+
+		public function toString():String
+		{
+			return StringUtils.format("[NebulaSession id={0}]", id);
+		}
+	}
 }

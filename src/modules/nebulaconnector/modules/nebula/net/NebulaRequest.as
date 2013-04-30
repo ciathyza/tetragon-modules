@@ -66,7 +66,8 @@ package modules.nebula.net
          * @param successHandler
          * @param errorHandler
          */
-        public function NebulaRequest(requestMethod:String, urlPath:String, sendData:Object = null, successHandler:Function = null, errorHandler:Function = null)
+        public function NebulaRequest(requestMethod:String, urlPath:String, sendData:Object = null,
+			successHandler:Function = null, errorHandler:Function = null)
         {
             this.requestMethod = requestMethod;
             this.urlPath = urlPath;
