@@ -81,7 +81,8 @@ package modules.nebula.net
          */
         public function toString():String
         {
-            return StringUtils.format("[NebulaRequest requestMethod={0} urlPath={1}]", requestMethod, urlPath);
+            return StringUtils.format("[NebulaRequest requestMethod={0} urlPath={1}]",
+				requestMethod, urlPath);
         }
     }
 }

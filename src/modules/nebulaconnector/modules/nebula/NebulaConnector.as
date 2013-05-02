@@ -842,9 +842,12 @@ package modules.nebula
 				return;
 			}
 
+			Log.verbose("startSession::", this);
+			
 			/* Success handler. */
 			var onSuccess:Function = function(r:NebulaRequest):void
 			{
+				Log.verbose("startSession.onSuccess::", this);
 				if (r.responseData)
 				{
 					/* Creates a new session from the values returned by the server. */
@@ -865,7 +868,7 @@ package modules.nebula
 					}
 					if (_debug)
 					{
-						log("Started Nebula session with ID \"" + _session.id.toString() + "\".");
+						log("Started Nebula session with ID \"" + _session.id + "\".");
 					}
 					if (_sessionStartedSignal)
 					{
@@ -881,6 +884,7 @@ package modules.nebula
 			/* Error handler. */
 			var onError:Function = function(r:NebulaRequest):void
 			{
+				Log.verbose("startSession.onError::", this);
 				callbackFail("Failed to start Nebula session.", METHOD_START_SESSION, r);
 			};
 			
@@ -1217,6 +1221,8 @@ package modules.nebula
 		 */
 		private function dequeuePendingRequest():void
 		{
+			Log.verbose("dequeuePendingRequest::", this);
+			
 			if (_pendingRequests.length != 0 && _currentRequest == null)
 			{
 				// sets the active request.
@@ -1272,7 +1278,9 @@ package modules.nebula
 
 				// checks if something should be done before sending the request.
 				if (_currentRequest.beforeSendHandler != null)
+				{
 					_currentRequest.beforeSendHandler(_currentRequest);
+				}
 
 				// loads the url.
 				_urlLoader.load(urlRequest);
@@ -1316,7 +1324,7 @@ package modules.nebula
 			else Log.error(message, this);
 
 			// TODO use the id field of the NebulaError to identify each possible error.
-			if (_errorSignal && method && error)
+			if (_errorSignal && method && error != null)
 			{
 				_errorSignal.dispatch(new NebulaError(0, error['type'], error['message'], error['details'], method));
 			}
@@ -1450,6 +1458,8 @@ package modules.nebula
 				return;
 			}
 
+			Log.verbose("processResponse::", this);
+			
 			var responseData:String = _urlLoader.data;
 			var isValid:Boolean = true;
 
@@ -1465,13 +1475,10 @@ package modules.nebula
 			}
 
 			/* Parse the data using the current parser. */
-			try
+			_currentRequest.responseData = _responseParser.parse(responseData);
+			if (!_currentRequest.responseData)
 			{
-				_currentRequest.responseData = _responseParser.parse(responseData);
-			}
-			catch (err:Error)
-			{
-				Log.error("processResponse: Failed to parse the Nebula response data! (Error was: " + err.message + ").", this);
+				Log.error("processResponse: responseData could not be parsed.", this);
 				if (_debug && responseData)
 				{
 					/* Dumping out a maximum of 256 chars of the response data. */
@@ -1480,14 +1487,14 @@ package modules.nebula
 				}
 				isValid = false;
 			}
-
+			
 			/* Check if it was successful. */
 			if (!isValid || _currentRequest.responseData['success'] == false)
 			{
 				if (_currentRequest.errorHandler != null)
 					_currentRequest.errorHandler(_currentRequest);
 			}
-			else if (_currentRequest.responseData['success'] == true)
+			if (isValid && _currentRequest.responseData['success'] == true)
 			{
 				if (_currentRequest.successHandler != null)
 					_currentRequest.successHandler(_currentRequest);
@@ -1517,6 +1524,8 @@ package modules.nebula
 				return;
 			}
 
+			Log.verbose("queueRequest::", this);
+			
 			/* Adds the request to the list. */
 			_pendingRequests.push(request);
 			/* Checks if it should be executed. */
@@ -1535,6 +1544,8 @@ package modules.nebula
 		 */
 		private function queueSignedRequest(request:NebulaRequest):void
 		{
+			Log.verbose("queueSignedRequest::", this);
+			
 			// adds the authToken/nonce if a session is available.
 			if (_session)
 			{
@@ -1546,7 +1557,9 @@ package modules.nebula
 
 			// if no function was provided, the request will be signed.
 			if (request.beforeSendHandler == null)
+			{
 				request.beforeSendHandler = signRequest;
+			}
 
 			queueRequest(request);
 		}

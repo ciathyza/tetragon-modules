@@ -28,13 +28,14 @@
  */
 package modules.nebula.utils
 {
-    import com.hexagonstar.util.json.LegacyJSON;
-
+	import tetragon.util.json.JSONWrapper;
+	
+	
     public class JSONResponseParser implements IResponseParser
     {
         public function parse(rawResponse:String):Object
         {
-            return LegacyJSON.decode(rawResponse);
+            return JSONWrapper.parse(rawResponse);
         }
     }
 }
