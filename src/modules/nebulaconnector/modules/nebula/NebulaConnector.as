@@ -33,14 +33,14 @@ package modules.nebula
 	import modules.nebula.net.*;
 	import modules.nebula.utils.*;
 
+	import tetragon.core.signals.Signal;
 	import tetragon.debug.Log;
 	import tetragon.modules.IModule;
 	import tetragon.modules.IModuleInfo;
 	import tetragon.modules.Module;
+	import tetragon.util.net.HTTPStatusCodes;
+	import tetragon.util.reflection.dumpObj;
 
-	import com.hexagonstar.net.HTTPStatusCodes;
-	import com.hexagonstar.signals.Signal;
-	import com.hexagonstar.util.reflection.dumpObj;
 	import com.hurlant.crypto.hash.HMAC;
 	import com.hurlant.crypto.hash.SHA1;
 	import com.hurlant.util.Hex;

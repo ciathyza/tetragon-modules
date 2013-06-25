@@ -27,8 +27,8 @@
  */
 package modules.audio
 {
-	import com.hexagonstar.tween.Tween;
-	import com.hexagonstar.tween.TweenVars;
+	import tetragon.util.tween.Tween;
+	import tetragon.util.tween.TweenVars;
 
 	import flash.events.Event;
 	import flash.media.Sound;

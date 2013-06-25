@@ -28,6 +28,7 @@
 package modules.facebook
 {
 	import tetragon.debug.Log;
+	import tetragon.util.reflection.getClassName;
 
 	import com.facebook.graph.Facebook;
 	import com.facebook.graph.data.Batch;
@@ -36,7 +37,6 @@ package modules.facebook
 	import com.facebook.graph.data.FacebookSession;
 	import com.facebook.graph.net.FacebookRequest;
 	import com.facebook.graph.utils.IResultParser;
-	import com.hexagonstar.util.reflection.getClassName;
 	
 	
 	/**

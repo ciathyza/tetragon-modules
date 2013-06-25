@@ -28,12 +28,11 @@
  */
 package modules.geolocation
 {
+	import tetragon.core.signals.Signal;
 	import tetragon.debug.Log;
 	import tetragon.modules.IModule;
 	import tetragon.modules.IModuleInfo;
 	import tetragon.modules.Module;
-
-	import com.hexagonstar.signals.Signal;
 
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;

@@ -28,14 +28,14 @@
 package modules.facebook
 {
 	import tetragon.BuildType;
+	import tetragon.core.signals.Signal;
 	import tetragon.debug.Log;
 	import tetragon.modules.IModule;
 	import tetragon.modules.IModuleInfo;
 	import tetragon.modules.Module;
+	import tetragon.util.reflection.getClassPropertyList;
 
 	import com.facebook.graph.data.FacebookSession;
-	import com.hexagonstar.signals.Signal;
-	import com.hexagonstar.util.reflection.getClassPropertyList;
 	
 	
 	/**
