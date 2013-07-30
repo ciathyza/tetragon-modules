@@ -47,7 +47,7 @@ package modules.geolocation
 		}
 		public function get build():String
 		{
-			return "24";
+			return "26";
 		}
 		public function get author():String
 		{

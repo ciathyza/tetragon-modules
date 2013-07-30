@@ -26,20 +26,20 @@
  * HOLDER OR ELSEWHERE WILL CREATE ANY WARRANTY OR CONDITION NOT EXPRESSLY STATED
  * IN THIS AGREEMENT.
  */
-package modules.nebula
+package modules.dbmanager
 {
 	import tetragon.modules.IModuleInfo;
 	
 	
 	/**
-	 * Module info class for Nebula Connector.
+	 * Module info class for Database Manager.
 	 * Auto-generated file. Do not edit!
 	 */
-	public final class NebulaConnectorModuleInfo implements IModuleInfo
+	public final class DatabaseManagerModuleInfo implements IModuleInfo
 	{
 		public function get name():String
 		{
-			return "Nebula Connector";
+			return "Database Manager";
 		}
 		public function get version():String
 		{
@@ -47,11 +47,11 @@ package modules.nebula
 		}
 		public function get build():String
 		{
-			return "409";
+			return "2";
 		}
 		public function get author():String
 		{
-			return "Joe";
+			return "Hexagon";
 		}
 	}
 }

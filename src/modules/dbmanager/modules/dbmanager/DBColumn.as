@@ -26,32 +26,25 @@
  * HOLDER OR ELSEWHERE WILL CREATE ANY WARRANTY OR CONDITION NOT EXPRESSLY STATED
  * IN THIS AGREEMENT.
  */
-package modules.nebula
+package modules.dbmanager
 {
-	import tetragon.modules.IModuleInfo;
-	
-	
 	/**
-	 * Module info class for Nebula Connector.
-	 * Auto-generated file. Do not edit!
+	 * DBColumn class
+	 *
+	 * @author Hexagon
 	 */
-	public final class NebulaConnectorModuleInfo implements IModuleInfo
+	public class DBColumn
 	{
-		public function get name():String
-		{
-			return "Nebula Connector";
-		}
-		public function get version():String
-		{
-			return "1.0.0";
-		}
-		public function get build():String
-		{
-			return "409";
-		}
-		public function get author():String
-		{
-			return "Joe";
-		}
+		//-----------------------------------------------------------------------------------------
+		// Properties
+		//-----------------------------------------------------------------------------------------
+		
+		public var name:String;
+		public var type:String;
+		public var primaryKey:Boolean;
+		public var autoInc:Boolean;
+		public var allowNull:Boolean;
+		public var unique:Boolean;
+		public var defaultValue:*;
 	}
 }
