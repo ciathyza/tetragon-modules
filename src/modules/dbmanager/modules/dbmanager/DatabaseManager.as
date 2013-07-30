@@ -650,6 +650,7 @@ package modules.dbmanager
 			if (_mode == MODE_INSERT_DEFAULT_ROWS_AFTER_RESET && _isInsertDefaultRows)
 			{
 				Log.notice("Rows already existed for some tables, ignoring!", this);
+				_rowsInsertCount--; // TODO Needs tersting!!
 				if (_rowsInsertCount == 0)
 				{
 					_mode = null;
@@ -658,7 +659,7 @@ package modules.dbmanager
 				}
 				else
 				{
-					_rowsInsertCount--;
+					//_rowsInsertCount--;
 				}
 				return;
 			}
