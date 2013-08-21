@@ -47,7 +47,7 @@ package modules.dbmanager
 		}
 		public function get build():String
 		{
-			return "3";
+			return "5";
 		}
 		public function get author():String
 		{

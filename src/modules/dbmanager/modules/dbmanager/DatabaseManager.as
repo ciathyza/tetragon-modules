@@ -777,8 +777,14 @@ package modules.dbmanager
 		 */
 		private function exportDataToFile(manifest:DatabaseManifest, table:DBTable, resultData:Array):void
 		{
-			if (table != null && resultData != null)
+			if (table != null)
 			{
+				if (!resultData)
+				{
+					Log.info("No table data found! Exporting empty table ...", this);
+					resultData = [];
+				}
+				
 				if (table.primaryKey != null)
 				{
 					resultData.sortOn(table.primaryKey, Array.NUMERIC);
@@ -846,6 +852,10 @@ package modules.dbmanager
 				{
 					Log.debug("Database table \"" + table.name + "\" exported.", this);
 				}
+			}
+			else
+			{
+				Log.debug("exportDataToFile:: Nothing to export!", this);
 			}
 			
 			_exportTablesCount--;
